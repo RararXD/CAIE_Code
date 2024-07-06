@@ -1,6 +1,6 @@
 # 检查依赖
-from src.requirements import test_requirements
-test_requirements()
+# from src.requirements import test_requirements
+# test_requirements()
 # 依赖库导入
 from ply import yacc
 from ply import lex
@@ -16,13 +16,13 @@ import src.global_var as global_var
 # 正式导入
 from src.lex import *
 from src.parse import *
-import src.options as options
+# import src.options as options
 from src.history import HOME_PATH
-from src.quit import quit
-from src.line_commands import run_command
-from src.update import update
-from src.update import update_expired
-from src.update import integrity_protection
+# from src.quit import quit
+# from src.line_commands import run_command
+# from src.update import update
+# from src.update import update_expired
+# from src.update import integrity_protection
 
 import sys
 import os
@@ -41,10 +41,10 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 # 错误的argument
-def wrong_argument(msg):
-    print(f'Unknown argument: {msg}')
-    print(f'Use `cpc -h` to get detailed informations about how to use')
-    quit(1)
+# def wrong_argument(msg):
+#     print(f'Unknown argument: {msg}')
+#     print(f'Use `cpc -h` to get detailed informations about how to use')
+#     quit(1)
     # options.help()
 
 # 清除注释以及多余字符
@@ -99,17 +99,17 @@ def multi_input():
 
 # 运行 AST
 def run_AST(ast, preload=False):
-    if options.get_value('show_tree') and not preload:
-        print(ast.get_tree())
+    # if options.get_value('show_tree') and not preload:
+    #     print(ast.get_tree())
 
-    if options.get_value('show_time') and not preload:
-        t = time()
+    # if options.get_value('show_time') and not preload:
+    #     t = time()
 
     ast.exe()
 
-    if options.get_value('show_time') and not preload:
-        t = time() - t
-        print(f'\033[4mDuration: {t}s\033[0m')
+    # if options.get_value('show_time') and not preload:
+    #     t = time() - t
+    #     print(f'\033[4mDuration: {t}s\033[0m')
 
 
 # 终端模式，逐行输入并解析运行
@@ -117,19 +117,19 @@ def with_line():
     global_var.set_running_mod('line')
     global_var.set_running_path('')
     # 基准输出
-    options.standard_output()
+    # options.standard_output()
     # 运行
     while 1:
         text = multi_input()
         lexer.lineno = 1
         # 尝试运行特殊指令
-        if run_command(text):
-            continue
+        # if run_command(text):
+        #     continue
 
         if not text:
             continue
         try:
-            ast = parser.parse(text, debug=options.get_value('show_parse'))
+            ast = parser.parse(text)
 
             run_AST(ast)
 
@@ -156,7 +156,7 @@ def with_file(path, preload=False):
     # 尝试运行
     try:
         if not preload:
-            ast = parser.parse(text, debug=options.get_value('show_parse'))
+            ast = parser.parse(text)
         else:
             ast = parser.parse(text)
 
@@ -170,55 +170,57 @@ def with_file(path, preload=False):
 # 主函数
 def main(input_=None, output_=None, addition_file_name=None):
     # 设置输入输出
-    if input_: global_var.set_std_in(input_)
-    if output_: global_var.set_std_out(output_)
+    # if input_: global_var.set_std_in(input_)
+    # if output_: global_var.set_std_out(output_)
 
-    # 解析参数
-    argv = sys.argv
-    file_paths = set()
-    i = 1
-    while i < len(argv):
-        arg = argv[i]
-        for opt in options.arguments:
-            if opt.check(arg):
-                opt.run(argv[i:])
-                i += opt.value_num
-                break
-        else:
-            if arg[0] == '-':
-                wrong_argument(f'Unknown option `{arg}`')
-            else:
-                file_paths.add(arg)
-        i += 1
+    # # 解析参数
+    # argv = sys.argv
+    # file_paths = set()
+    # i = 1
+    # while i < len(argv):
+    #     arg = argv[i]
+    #     for opt in options.arguments:
+    #         if opt.check(arg):
+    #             opt.run(argv[i:])
+    #             i += opt.value_num
+    #             break
+    #     else:
+    #         if arg[0] == '-':
+    #             wrong_argument(f'Unknown option `{arg}`')
+    #         else:
+    #             file_paths.add(arg)
+    #     i += 1
 
-    if addition_file_name:
-        file_paths.add(addition_file_name)
+    # if addition_file_name:
+    #     file_paths.add(addition_file_name)
 
-    if not config.get_config('dev') and config.get_config('integrity-protection'):
-        integrity_protection()
+    # if not config.get_config('dev') and config.get_config('integrity-protection'):
+    #     integrity_protection()
 
-    #自动更新
-    if config.get_config('dev.simulate-update') or (config.get_config('auto-update') and not config.get_config('dev') and update_expired()):
-        update()
-        config.update_config('last-auto-update', str(time()))
+    # #自动更新
+    # if config.get_config('dev.simulate-update') or (config.get_config('auto-update') and not config.get_config('dev') and update_expired()):
+    #     update()
+    #     config.update_config('last-auto-update', str(time()))
 
-    # 预加载文件
-    preload_scripts()
+    # # 预加载文件
+    # preload_scripts()
 
-    # 选择模式运行
-    if not file_paths:
-        with_line()
-    else:
-        for file_path in file_paths:
-            lexer.lineno = 1
-            # 选择模式运行
-            if os.path.exists(file_path):
-                if os.path.isfile(file_path):
-                    with_file(file_path)
-                else:
-                    wrong_argument(f'`{file_path}` is not a file')
-            else:
-                wrong_argument(f'File `{file_path}` does not exist')
+    # # 选择模式运行
+    # if not file_paths:
+    #     with_line()
+    # else:
+    #     for file_path in file_paths:
+    #         lexer.lineno = 1
+    #         # 选择模式运行
+    #         if os.path.exists(file_path):
+    #             if os.path.isfile(file_path):
+    #                 with_file(file_path)
+    #             else:
+    #                 wrong_argument(f'`{file_path}` is not a file')
+    #         else:
+    #             wrong_argument(f'File `{file_path}` does not exist')
+
+    with_line()
 
 # 加载基础类型
 global_var.__init__()
@@ -227,15 +229,17 @@ lexer = lex.lex()
 parser = yacc.yacc()
 
 # 程序入口
-if __name__ == '__main__':
-    try:
-        main()
-    except EOFError:
-        print("EXIT")
-        quit(2)
-    except KeyboardInterrupt:
-        print('Keyboard Interrupt')
-        quit(1)
-    except Exception as e:
-        print(e)
-        quit(3)
+# if __name__ == '__main__':
+#     try:
+#         main()
+#     except EOFError:
+#         print("EXIT")
+#         quit(2)
+#     except KeyboardInterrupt:
+#         print('Keyboard Interrupt')
+#         quit(1)
+#     except Exception as e:
+#         print(e)
+#         quit(3)
+
+main().__jit__()

@@ -1,5 +1,4 @@
 from .error import *
-from . import options
 from .history import Cmd
 from .config import Config
 import sys
@@ -95,12 +94,6 @@ def input_():
 
 # 输出错误信息
 def output_error():
-    if not options.get_value('show_error'):
-        # 如果不显示错误信息
-        # 清空错误并直接返回
-        clear_error_messages()
-        return
-
     for path, errs in errors.items():
         errs.sort()
         l = set()

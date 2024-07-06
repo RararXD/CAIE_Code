@@ -1,7 +1,7 @@
 requirements = [
     ('ply', 'ply'),
     ('chardet', 'chardet'),
-    ('GitPython', 'git'),
+    # ('GitPython', 'git'),
     ('colorama', 'colorama'),
     ('requests', 'requests'),
 ]
@@ -13,12 +13,16 @@ def test_requirements():
     import importlib
     import sys
     import os
+    import pip
+
     for package_name, import_name in requirements:
         try:
             importlib.import_module(import_name)
         except:
             print(f'Missing Important Dependence `{package_name}`\nTrying to Install for You...')
             if os.environ.get('CODESPACES'):
-                os.system(f'"{sys.executable}" -m pip install {package_name}')
+                pip.main(['install', package_name])
+                # os.system(f'"{sys.executable}" -m pip install {package_name}')
             else:
-                os.system(f'"{sys.executable}" -m pip install {package_name} -i {tuna}')
+                pip.main(['install', package_name, '-i', {tuna}])
+                # os.system(f'"{sys.executable}" -m pip install {package_name} -i {tuna}')
